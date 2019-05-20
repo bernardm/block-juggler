@@ -1,7 +1,7 @@
 {
 	"name": "block-juggler",
 	"displayName": "Block Juggler",
-	"description": "desc",
+	"description": "Text extraction, transform, categorization, and shell processing.",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.34.0"
@@ -10,14 +10,14 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:block-juggler.classify"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
+				"command": "block-juggler.classify",
+				"title": "Parse tagged blocks"
 			}
 		]
 	},
@@ -34,5 +34,8 @@
 		"tslint": "^5.12.1",
 		"@types/node": "^10.12.21",
 		"@types/mocha": "^2.2.42"
+	},
+	"dependencies": {
+		"sanitize-filename": "^1.6.1"
 	}
 }

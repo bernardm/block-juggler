@@ -1,25 +1,36 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { TagStream } from './tag_stream';
+import { blockParse } from './block_parse';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+	console.log('Congratulations, your extension "Block Juggler" is now active!');
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-		console.log('Congratulations, your extension "block-juggler" is now active!');
+	let disposable = vscode.commands.registerCommand('block-juggler.classify', () => {
+		vscode.window.showInformationMessage('Extension started!');
+		const activeEditor = vscode.window.activeTextEditor;
+		if (activeEditor) {
+			const document    : vscode.TextDocument = activeEditor.document;
+			const docSelection: vscode.Selection    = activeEditor.selection;
+			const docRange    : vscode.Range        = document.validateRange(
+				(docSelection.isEmpty)?
+					new vscode.Range(0, 0, document.lineCount, 0):  // entire document
+					docSelection); 									// hilighted selection
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('extension.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
+			let text:string = document.getText(docRange);
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World!');
+			// TODO move TagStream inside blockPares
+			const io:TagStream = new TagStream(vscode);
+			text = blockParse(text, io);
+			io.close();
+
+			activeEditor.edit(builder => builder.replace(docRange, text))
+			.then(success => {
+				const postion = activeEditor.selection.end;
+				activeEditor.selection = new vscode.Selection(postion, postion);
+			});
+		}
+		vscode.window.showInformationMessage('Extension executed!');
 	});
-
 	context.subscriptions.push(disposable);
 }
 
