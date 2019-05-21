@@ -1,8 +1,20 @@
 {
 	"name": "block-juggler",
+	"version": "0.0.1",
 	"displayName": "Block Juggler",
 	"description": "Text extraction, transform, categorization, and shell processing.",
-	"version": "0.0.1",
+	"keywords": [
+		"text",
+		"shell"
+	],
+	"author": "Bernard Martis",
+	"homepage": "https://github.com/bernardm/block-juggler",
+	"bugs": "https://github.com/bernardm/block-juggler/issues",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/bernardm/block-juggler.git"
+	},
+    "license": "GPL-3.0-only",
 	"engines": {
 		"vscode": "^1.34.0"
 	},
@@ -17,9 +29,15 @@
 		"commands": [
 			{
 				"command": "block-juggler.classify",
-				"title": "Parse tagged blocks"
+				"title": "juggler: Parse document"
 			}
-		]
+		],
+		"keybindings": [{
+			"command": "block-juggler.classify",
+			"key": "alt+p",
+			"mac": "alt+p",
+			"when": "editorTextFocus"
+		}]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
