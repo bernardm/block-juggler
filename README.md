@@ -2,7 +2,9 @@
 
 Text extraction, transform, categorization, and shell processing Extension for VS Code. 
 
-This is the README for your extension "block-juggler". After writing up a brief description, we recommend including the following sections.
+// TODO block juggler readme
+
+his is the README for your extension "block-juggler". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 

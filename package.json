@@ -1,6 +1,6 @@
 {
 	"name": "block-juggler",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"displayName": "Block Juggler",
 	"description": "Text extraction, transform, categorization, and shell processing.",
 	"keywords": [
@@ -8,6 +8,7 @@
 		"shell"
 	],
 	"author": "Bernard Martis",
+	"publisher": "bernard-martis",
 	"homepage": "https://github.com/bernardm/block-juggler",
 	"bugs": "https://github.com/bernardm/block-juggler/issues",
 	"repository": {
@@ -44,7 +45,8 @@
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"postinstall": "node ./node_modules/vscode/bin/install",
-		"test": "npm run compile && node ./node_modules/vscode/bin/test"
+		"test": "npm run compile && node ./node_modules/vscode/bin/test",
+		"package": "vsce package && code --install-extension block-juggler-0.0.2.vsix"
 	},
 	"devDependencies": {
 		"typescript": "^3.3.1",

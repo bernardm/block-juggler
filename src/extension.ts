@@ -3,7 +3,7 @@ import { TagStream } from './tag_stream';
 import { blockParse } from './block_parse';
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Congratulations, your extension "Block Juggler" is now active!');
+	console.log('Congratulations, your extension "Block Juggler v0.0.1" is now active!');
 
 	let disposable = vscode.commands.registerCommand('block-juggler.classify', () => {
 		vscode.window.showInformationMessage('Extension started!');
