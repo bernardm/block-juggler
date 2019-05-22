@@ -3,10 +3,9 @@ import { TagStream } from './tag_stream';
 import { blockParse } from './block_parse';
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Congratulations, your extension "Block Juggler v0.0.1" is now active!');
+	// this runs once on extension activation
 
 	let disposable = vscode.commands.registerCommand('block-juggler.classify', () => {
-		vscode.window.showInformationMessage('Extension started!');
 		const activeEditor = vscode.window.activeTextEditor;
 		if (activeEditor) {
 			const document    : vscode.TextDocument = activeEditor.document;
@@ -18,7 +17,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 			let text:string = document.getText(docRange);
 
-			// TODO move TagStream inside blockPares
 			const io:TagStream = new TagStream(vscode);
 			text = blockParse(text, io);
 			io.close();
@@ -29,7 +27,7 @@ export function activate(context: vscode.ExtensionContext) {
 				activeEditor.selection = new vscode.Selection(postion, postion);
 			});
 		}
-		vscode.window.showInformationMessage('Extension executed!');
+		vscode.window.showInformationMessage('Block Juggler finished processing.');
 	});
 	context.subscriptions.push(disposable);
 }
