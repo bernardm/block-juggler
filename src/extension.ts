@@ -2,10 +2,24 @@ import * as vscode from 'vscode';
 import { TagStream } from './tag_stream';
 import { blockParse } from './block_parse';
 
-export function activate(context: vscode.ExtensionContext) {
+// VS Code properties
+let myStatusBarItem: vscode.StatusBarItem;
+
+export function activate({ subscriptions }: vscode.ExtensionContext) {
 	// this runs once on extension activation
 
-	let disposable = vscode.commands.registerCommand('block-juggler.classify', () => {
+	const myCommandId = 'block-juggler.classify';
+
+	// create a new status bar item that we can now manage
+	myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+	myStatusBarItem.command = myCommandId;
+	subscriptions.push(myStatusBarItem);
+
+	myStatusBarItem.text = `$(megaphone) Block Juggler active!!`;
+
+	const disposable = vscode.commands.registerCommand(myCommandId, () => {
+		myStatusBarItem.show();
+
 		const activeEditor = vscode.window.activeTextEditor;
 		if (activeEditor) {
 			const document    : vscode.TextDocument = activeEditor.document;
@@ -15,7 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
 					new vscode.Range(0, 0, document.lineCount, 0):  // entire document
 					docSelection); 									// hilighted selection
 
-			let text:string = document.getText(docRange);
+			let text:string    = document.getText(docRange);
 
 			const io:TagStream = new TagStream(vscode);
 			text = blockParse(text, io);
@@ -27,10 +41,14 @@ export function activate(context: vscode.ExtensionContext) {
 				activeEditor.selection = new vscode.Selection(postion, postion);
 			});
 		}
-		vscode.window.showInformationMessage('Block Juggler finished processing.');
+
+		vscode.window.showInformationMessage('Block Juggler finished.');
+		myStatusBarItem.hide();
 	});
-	context.subscriptions.push(disposable);
+	subscriptions.push(disposable);
+
 }
 
 // this method is called when your extension is deactivated
 export function deactivate() {}
+

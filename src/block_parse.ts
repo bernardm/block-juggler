@@ -17,28 +17,42 @@ export function blockParse(docText: string, io: TagStream) {
    if (docBlocks) {
       docText = '';
       for (let blockIndex = 1; blockIndex < docBlocks.length; blockIndex += 2) {
-         const blockData   =  docBlocks[blockIndex + 1];
-         const lineEndPos  =  blockData.indexOf('\n');
+         const blockType   = docBlocks[blockIndex];
+         const blockData  =  docBlocks[blockIndex + 1];
+         let blockAction:string;
+         let blockText:string;
 
          // the first line always contains comma delimited tags or is empty
-         const blockAction = blockData.slice(0, lineEndPos);
-         const blockText   = blockData.slice(lineEndPos + 1) + '\n';
-         const blockType   = docBlocks[blockIndex];
+         let  lineEndPos  =  blockData.indexOf('\n');
+         if( lineEndPos > 0 ) {
+            blockAction = blockData.slice(0, lineEndPos);
+            blockText   = blockData.slice(lineEndPos + 1) + '\n';
+         } else {
+            blockAction = blockData;
+            blockText   = '';
+         }
+
          switch (blockType) {
             case 'tag':
                for (let tag of blockAction.split(',').map(s => s.trim().toLowerCase())) {
-                  if (tag)  { io.streamFor(tag).write(blockText); }  //  write to tag file
-                  else      { docText = docText + blockText; }       //  write to editor  
+                  if (tag)  { 
+                     io.streamFor(tag).write(blockText); 
+                  }  //  write to tag file
+                  else      { docText = docText + blockText; }       //  write to editor
                } // for( tag )
                break;
 
             case 'cmd':
                let cmdOutput:string;
-               try        { cmdOutput = cp.execSync(blockAction, { input: blockText }).toString(); }
+               try { cmdOutput = cp.execSync(blockAction, { input: blockText }).toString(); }
                catch(err) { cmdOutput = err.message; }
-               if (cmdOutput) { docText = `${docText}cmd# rem\n${cmdOutput}tag#\n`; }
+               if ( cmdOutput && cmdOutput.substr(-1) !== '\n' ) {
+                  cmdOutput.concat('\n');
+               }
+               docText = `${docText}cmd# rem\n${blockAction}\n\n${cmdOutput}tag#\n`;
          }
       }
    }
    return docText;
 } // blockParse()
+
