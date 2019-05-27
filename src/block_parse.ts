@@ -10,8 +10,9 @@ const cp = require('child_process');
  * @returns document text with tagged data removed.
  */
 export function blockParse(docText: string, io: TagStream) {
-   docText = '\ntag#\n' + docText;
-   const regxBlock = /\n(tag|cmd)\#/m;
+   docText = '\n===\n' + docText;
+   // tag marker is === , execute marker is \\\
+   const regxBlock = /\n(\=\=\=|\\\\\\)/m;
    const docBlocks = docText.split(regxBlock);
 
    if (docBlocks) {
@@ -24,35 +25,34 @@ export function blockParse(docText: string, io: TagStream) {
 
          // the first line always contains comma delimited tags or is empty
          let  lineEndPos  =  blockData.indexOf('\n');
-         if( lineEndPos > 0 ) {
-            blockAction = blockData.slice(0, lineEndPos);
-            blockText   = blockData.slice(lineEndPos + 1) + '\n';
-         } else {
+         if( lineEndPos === -1 ) {
             blockAction = blockData;
             blockText   = '';
-         }
+         } else {
+            blockAction = blockData.slice(0, lineEndPos);
+            blockText   = blockData.slice(lineEndPos + 1) + '\n';         }
 
          switch (blockType) {
-            case 'tag':
+            case '===':
                for (let tag of blockAction.split(',').map(s => s.trim().toLowerCase())) {
-                  if (tag)  { 
-                     io.streamFor(tag).write(blockText); 
-                  }  //  write to tag file
-                  else      { docText = docText + blockText; }       //  write to editor
+                  if (tag)  { //  write to tag file
+                     io.streamFor(tag).write(blockText);
+                  } else {    //  write to editor
+                     docText = docText + blockText;
+                  }
                } // for( tag )
                break;
 
-            case 'cmd':
+            case '\\\\\\':
                let cmdOutput:string;
                try { cmdOutput = cp.execSync(blockAction, { input: blockText }).toString(); }
                catch(err) { cmdOutput = err.message; }
                if ( cmdOutput && cmdOutput.substr(-1) !== '\n' ) {
                   cmdOutput.concat('\n');
                }
-               docText = `${docText}cmd# rem\n${blockAction}\n\n${cmdOutput}tag#\n`;
+               docText = `${docText}\\\\\\ rem ${blockAction}\n${cmdOutput}===\n`;
          }
       }
    }
    return docText;
 } // blockParse()
-

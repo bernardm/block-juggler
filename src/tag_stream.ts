@@ -50,7 +50,7 @@ export class TagStream {
 			const tagFile = path.resolve(this.tagFolder, sanitize(tag)+'.txt');
 			const out = fs.createWriteStream(tagFile, {flags:'a'});
 			this.tagStream[tag] = out;
-			out.write('\n###\n');
+			out.write('\n===\n');
 			out.on('error', function(this: TagStream, err: string) {
 				console.error(err);
 				out.end();

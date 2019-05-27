@@ -4,5 +4,6 @@ node_modules/
 .vscode-test/
 *.vsix
 .vscodeignore
-workflow/
-tag/
+
+# Bernard Martis - Workspace
+blocks/
