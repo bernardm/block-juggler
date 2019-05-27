@@ -29,7 +29,7 @@ export function activate({ subscriptions }: vscode.ExtensionContext) {
 					new vscode.Range(0, 0, document.lineCount, 0):  // entire document
 					docSelection); 									// hilighted selection
 
-			let text:string    = document.getText(docRange);
+			let text:string = document.getText(docRange);
 
 			const io:TagStream = new TagStream(vscode);
 			text = blockParse(text, io);

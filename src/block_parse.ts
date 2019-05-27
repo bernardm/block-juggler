@@ -33,24 +33,29 @@ export function blockParse(docText: string, io: TagStream) {
             blockText   = blockData.slice(lineEndPos + 1) + '\n';         }
 
          switch (blockType) {
-            case '===':
-               for (let tag of blockAction.split(',').map(s => s.trim().toLowerCase())) {
-                  if (tag)  { //  write to tag file
-                     io.streamFor(tag).write(blockText);
-                  } else {    //  write to editor
-                     docText = docText + blockText;
-                  }
-               } // for( tag )
-               break;
+         case '===':
+            for (let tag of blockAction.split(',').map(s => s.trim().toLowerCase())) {
+               if (tag)  { //  write to tag file
+                  io.streamFor(tag).write(blockText);
+               } else {    //  write to editor
+                  docText = docText + blockText;
+               }
+            } // for( tag )
+            break;
 
-            case '\\\\\\':
-               let cmdOutput:string;
-               try { cmdOutput = cp.execSync(blockAction, { input: blockText }).toString(); }
-               catch(err) { cmdOutput = err.message; }
-               if ( cmdOutput && cmdOutput.substr(-1) !== '\n' ) {
+         case '\\\\\\':
+            let cmdOutput:string;
+            try { cmdOutput = cp.execSync(blockAction, { input: blockText }).toString(); }
+            catch(err) { cmdOutput = err.message; }
+            // display output if present
+            if ( cmdOutput ) {
+               // output ends on a new line
+               if( cmdOutput.substr(-1) !== '\n' ) {
                   cmdOutput.concat('\n');
                }
                docText = `${docText}\\\\\\ rem ${blockAction}\n${cmdOutput}===\n`;
+            }
+            break;
          }
       }
    }
