@@ -6,4 +6,4 @@ node_modules/
 .vscodeignore
 
 # Bernard Martis - Workspace
-blocks/
+workflow/

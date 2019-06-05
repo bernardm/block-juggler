@@ -3,35 +3,42 @@ import * as fs from 'fs';
 const path = require("path");
 const sanitize = require("sanitize-filename");
 
+export interface MyWriteStream extends fs.WriteStream {
+	[tag: string]: any;
+}
 export class TagStream {
 	private tagStream = Object.setPrototypeOf({}, null);
-	private tagFolder:string = '';
+	private tagFolder:string = '.';
 
-	constructor(vscode:any) {
-		// first, try the project folder
-		this.tagFolder = vscode.workspace.rootPath;
-
-		// second, try the current document folder
+	constructor (vscode:any) {
+		// first, try the current document folder
 		const activeEditor = vscode.window.activeTextEditor;
-		if( !this.tagFolder && activeEditor ) {
+		if ( activeEditor ) {
 			const currentFileName = activeEditor.document.fileName;
-			if( currentFileName ) {
+			if ( currentFileName ) {
 				this.tagFolder = path.dirname(currentFileName);
-			} 
-		}
-		// default to current working directory
-		// turns out we dont have permissions to write to current working directory
-		this.tagFolder = path.resolve(this.tagFolder, 'blocks/');
-
-		// create directory if needed
-		try {
-			if( !fs.existsSync(this.tagFolder) ) {
-				fs.mkdirSync(this.tagFolder);
 			}
 		}
-		catch (err) {
-			vscode.window.showErrorMessage('Cannot write to block directory.\n' + this.tagFolder);
-			throw err;
+
+		// second, try the project folder
+		if ( this.tagFolder === '.' ) {
+			this.tagFolder = vscode.workspace.rootPath;
+		}
+
+		// default to users home directory
+		if( !this.tagFolder ) {
+			this.tagFolder = path.resolve(require('os').homedir(), 'blocks/');
+
+			// create directory if needed
+			try {
+				if( !fs.existsSync(this.tagFolder) ) {
+					fs.mkdirSync(this.tagFolder);
+				}
+			}
+			catch (err) {
+				vscode.window.showErrorMessage('Cannot write to block directory.\n' + this.tagFolder);
+				throw err;
+			}
 		}
 	} // constructor()
 
@@ -45,16 +52,23 @@ export class TagStream {
 		this.tagStream = {};
 	}
 
-	public streamFor( tag: string) {
+	public streamFor( tag:string ) {
+		let tagFile:string;
 		if( !this.tagStream[tag] ) {
-			const tagFile = path.resolve(this.tagFolder, sanitize(tag)+'.txt');
-			const out = fs.createWriteStream(tagFile, {flags:'a'});
+			if (tag.indexOf('.') > -1) { // tag is a file
+				tagFile = path.resolve(this.tagFolder, sanitize(tag));
+			} else { // tag is a word
+				tagFile = path.resolve(this.tagFolder, sanitize(tag)+'.txt');
+			}
+
+			const out:MyWriteStream = fs.createWriteStream(tagFile, {flags:'a'});
 			this.tagStream[tag] = out;
+			out.tag = tag;
 			out.write('\n===\n');
-			out.on('error', function(this: TagStream, err: string) {
+			out.on('error', function(this: MyWriteStream, err: string) {
 				console.error(err);
+				console.table(this.tag);
 				out.end();
-				this.tagStream[tag] = null;
 			});
 		}
 		return this.tagStream[tag];
