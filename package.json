@@ -1,70 +1,72 @@
 {
-    "name":"block-juggler",
-    "version":"0.1.1",
-    "displayName":"Block Juggler",
-    "description":"Text transformation, categorization, and shell execution from within the text editor.",
-    "keywords":[
+    "name": "block-juggler",
+    "version": "0.1.1",
+    "displayName": "Block Juggler",
+    "description": "Text transformation, categorization, and shell execution from within the text editor.",
+    "keywords": [
         "text",
         "shell"
     ],
-    "author":{
-        "name":"Bernard Martis"
+    "author": {
+        "name": "Bernard Martis"
     },
-    "categories":[
+    "categories": [
         "Other"
     ],
-    "icon":"images/icon.png",
-    "galleryBanner":{
-        "color":"#68c61c",
-        "theme":"light"
+    "icon": "images/icon.png",
+    "galleryBanner": {
+        "color": "#68c61c",
+        "theme": "light"
     },
-    "publisher":"bernard-martis",
-    "homepage":"https://github.com/bernardm/block-juggler",
-    "bugs":"https://github.com/bernardm/block-juggler/issues",
-    "repository":{
-        "type":"git",
-        "url":"git://github.com/bernardm/block-juggler.git"
+    "publisher": "bernard-martis",
+    "homepage": "https://github.com/bernardm/block-juggler",
+    "bugs": "https://github.com/bernardm/block-juggler/issues",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/bernardm/block-juggler.git"
     },
-    "license":"GPL-3.0-only",
-    "engines":{
-        "vscode":"^1.34.0"
+    "license": "GPL-3.0-only",
+    "engines": {
+        "vscode": "^1.34.0"
     },
-    "activationEvents":[
+    "activationEvents": [
         "onCommand:block-juggler.classify"
     ],
-    "main":"./out/extension.js",
-    "contributes":{
-        "commands":[
+    "main": "./out/extension.js",
+    "contributes": {
+        "commands": [
             {
-                "command":"block-juggler.classify",
-                "title":"juggler: Parse document"
+                "command": "block-juggler.classify",
+                "title": "juggler: Parse document"
             }
         ],
-        "keybindings":[
+        "keybindings": [
             {
-                "command":"block-juggler.classify",
-                "key":"alt+p",
-                "mac":"alt+p",
-                "when":"editorTextFocus"
+                "command": "block-juggler.classify",
+                "key": "alt+p",
+                "mac": "alt+p",
+                "when": "editorTextFocus"
             }
         ]
     },
-    "scripts":{
-        "vscode:prepublish":"npm run compile",
-        "compile":"tsc -p ./",
-        "watch":"tsc -watch -p ./",
-        "postinstall":"node ./node_modules/vscode/bin/install",
-        "test":"npm run compile && node ./node_modules/vscode/bin/test",
-        "package":"vsce package"
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test-vscode": "npm run compile && node ./node_modules/vscode/bin/test",
+        "test": "npm run compile && mocha --ui bdd ./out/test/*.test.js",
+        "package": "vsce package"
     },
-    "devDependencies":{
-        "typescript":"^3.3.1",
-        "vscode":"^1.1.28",
-        "tslint":"^5.12.1",
-        "@types/node":"^10.12.21",
-        "@types/mocha":"^2.2.42"
+    "devDependencies": {
+        "@types/mocha": "^2.2.42",
+        "@types/node": "^10.12.21",
+        "mock-fs": "^4.10.1",
+        "sanitize-filename": "^1.6.1",
+        "ts-mockito": "^2.3.1",
+        "tslint": "^5.12.1",
+        "typescript": "^3.3.1",
+        "vscode": "^1.1.28"
     },
-    "dependencies":{
-        "sanitize-filename":"^1.6.1"
-    }
+    "dependencies": {}
 }
