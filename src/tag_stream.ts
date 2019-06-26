@@ -3,7 +3,7 @@ import * as fs from 'fs';
 const path = require("path");
 const sanitize = require("sanitize-filename");
 
-export interface MyWriteStream extends fs.WriteStream {
+interface MyWriteStream extends fs.WriteStream {
 	[tag: string]: any;
 }
 export class TagStream {
@@ -52,7 +52,7 @@ export class TagStream {
 		this.tagStream = {};
 	}
 
-	public streamFor( tag:string ) {
+	public writeFor( tag:string, block:string ) {
 		let tagFile:string;
 		if( !this.tagStream[tag] ) {
 			if (tag.indexOf('.') > -1) { // tag is a file
@@ -71,6 +71,6 @@ export class TagStream {
 				out.end();
 			});
 		}
-		return this.tagStream[tag];
+		this.tagStream[tag].write(block);
 	}
 }

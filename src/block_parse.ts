@@ -10,7 +10,11 @@ const cp = require('child_process');
  * @returns document text with tagged data removed.
  */
 export function blockParse(docText: string, io: TagStream) {
-   docText = '\n===\n' + docText;
+   // when input starts with a incomplete tag marker
+   if( docText.substring(0,3) === '===' ) {
+      docText = '\n' + docText;
+   }
+
    // tag marker is === , execute marker is \\\
    const regxBlock = /\n(\=\=\=|\\\\\\)/m;
    const docBlocks = docText.split(regxBlock);
@@ -24,19 +28,21 @@ export function blockParse(docText: string, io: TagStream) {
          let blockText:string;
 
          // the first line always contains comma delimited tags or is empty
+         //TODO refactor - move to appropriate case
          let  lineEndPos  =  blockData.indexOf('\n');
          if( lineEndPos === -1 ) {
             blockAction = blockData;
             blockText   = '';
          } else {
             blockAction = blockData.slice(0, lineEndPos);
-            blockText   = blockData.slice(lineEndPos + 1) + '\n';         }
+            blockText   = blockData.slice(lineEndPos + 1) + '\n';
+         }
 
          switch (blockType) {
          case '===':
             for (let tag of blockAction.split(',').map(s => s.trim().toLowerCase())) {
                if (tag)  { //  write to tag file
-                  io.streamFor(tag).write(blockText);
+                  io.writeFor(tag, blockText);
                } else {    //  write to editor
                   docText = docText + blockText;
                }

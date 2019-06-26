@@ -3,6 +3,8 @@ const path   = require('path');
 const mockFS = require('mock-fs');
 
 describe('TagStream', function() {
+  const assert = require('assert');
+
   const Filename:string = path.resolve('file.txt');
   const DirTree: {[key: string]: string;} = {};
 
