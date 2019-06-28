@@ -1,4 +1,4 @@
-import { TagStream } from './tag_stream';
+import { TagStore } from './tag_store';
 const cp = require('child_process');
 
 /**
@@ -6,10 +6,10 @@ const cp = require('child_process');
  *
  * @export blockParse()
  * @param {string}    docText text to parse
- * @param {TagStream} io      initialized TagStream object
+ * @param {TagStore} io      initialized TagStream object
  * @returns document text with tagged data removed.
  */
-export function blockParse(docText: string, io: TagStream) {
+export function blockParse(docText: string, io: TagStore) {
    // when input starts with a incomplete tag marker
    if( docText.substring(0,3) === '===' ) {
       docText = '\n' + docText;
@@ -28,7 +28,7 @@ export function blockParse(docText: string, io: TagStream) {
          let blockText:string;
 
          // the first line always contains comma delimited tags or is empty
-         //TODO refactor - move to appropriate case
+         //TODO refactor - move to appropriate case when modifying tag
          let  lineEndPos  =  blockData.indexOf('\n');
          if( lineEndPos === -1 ) {
             blockAction = blockData;

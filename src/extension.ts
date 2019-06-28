@@ -1,5 +1,8 @@
-import * as vscode from 'vscode';
-import { TagStream } from './tag_stream';
+import * as vscode    from 'vscode';
+import * as fs        from  'fs';
+
+import { workingDir } from './dir';
+import { TagStore }   from './tag_store';
 import { blockParse } from './block_parse';
 
 // VS Code properties
@@ -7,7 +10,6 @@ let myStatusBarItem: vscode.StatusBarItem;
 
 export function activate({ subscriptions }: vscode.ExtensionContext) {
 	// this runs once on extension activation
-
 	const myCommandId = 'block-juggler.classify';
 
 	// create a new status bar item that we can now manage
@@ -29,14 +31,13 @@ export function activate({ subscriptions }: vscode.ExtensionContext) {
 					new vscode.Range(0, 0, document.lineCount, 0):  // entire document
 					docSelection); 									// hilighted selection
 
-			let text:string = document.getText(docRange);
-
-			const io:TagStream = new TagStream(vscode);
-			text = blockParse(text, io);
+			const io:TagStore = new TagStore(workingDir(vscode, fs));
+			blockParse(document.getText(docRange), io);
 			io.close();
 
-			activeEditor.edit(builder => builder.replace(docRange, text))
-			.then(success => {
+			activeEditor
+			.edit(builder => builder.replace(docRange, io.editorText))
+			.then(() => {
 				const postion = activeEditor.selection.end;
 				activeEditor.selection = new vscode.Selection(postion, postion);
 			});
@@ -46,9 +47,9 @@ export function activate({ subscriptions }: vscode.ExtensionContext) {
 		myStatusBarItem.hide();
 	});
 	subscriptions.push(disposable);
-
-}
+} // activate()
 
 // this method is called when your extension is deactivated
 export function deactivate() {}
+
 
