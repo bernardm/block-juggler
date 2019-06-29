@@ -1,10 +1,14 @@
-import { TagStore } from '../tag_store';
+import { TagStore, workingDir } from '../tag_store';
 
 const fs     = require('fs'); // include before mock-fs
-const path   = require('path');
 const mockFS = require('mock-fs');
+const path   = require('path');
 const os     = require('os');
-import { workingDir } from '../dir';
+
+// test constants
+const testDir:string  = path.resolve('/the/seven/bloody/hells/');
+const testFile:string = path.resolve(testDir, 'test.file');
+const testData:string = 'data\n';
 
 // mock for vscode
 namespace vscode {
@@ -24,31 +28,52 @@ describe('Persistence', function() {
   const assert = require('assert');
 
   describe('TagStore', function() {
+    beforeEach(()=>{
+      mockFS({[testDir]: {}});
+    });
+    after(()=>{
+      mockFS.restore();
+    });
+
     it('should alter fs with mocked dir structure', function() {
-      const Filename:string = path.resolve('C:\\Users\\martisb\\DUMMY.txt');
-      const returnDir:string = path.resolve('C:\\Users\\martisb\\HELLO\\HI');
-      const DirTree: {[key: string]: string;} = {};
-      const testData = 'TEST';
+      const newDir = path.resolve(testDir, 'new/');
 
-      DirTree[Filename] = testData;
-      mockFS(DirTree);
+      fs.mkdirSync(newDir);
+      assert.ok(fs.existsSync(newDir));
+    });
 
-      const readStream = fs.createReadStream(Filename);
-      fs.mkdir(returnDir, null, (err:any) => {
-        if (err) {throw err;}
-      });
+    it("should map a pure tag to the same file regardless of case", function(done) {
+      const io:TagStore = new TagStore(testDir);
+      const writer = fs.createWriteStream(testFile, {flags:'a'});
+      io._setStream('tag', writer);
 
-      let fileData:string  = '';
-      readStream.on('data',function(data:any){
-        fileData += data.toString();
-      });
+      io.writeFor('tag', testData);
+      io.writeFor('Tag', testData);
+      io.writeFor('TAG', testData);
+      io.close();
 
-      readStream.on('end',function(){
-        assert.equal(fileData, testData);
+      writer.on('close', ()=>{
+        let fileData:string  = fs.readFileSync(testFile, 'utf8');
+        assert.equal(fileData, testData+testData+testData);
+        done();
       });
     });
 
-  });
+    it("should interpret a tag name with a period as a file", function(done) {
+      const io:TagStore = new TagStore(testDir);
+      const writer = fs.createWriteStream(testFile, {flags:'a'});
+
+      io._setStream(testFile, writer);
+      io.writeFor(testFile, testData);
+      io.close();
+
+      writer.on('close', ()=>{
+        let fileData:string  = fs.readFileSync(testFile, 'utf8');
+        assert.equal(fileData, testData);
+        done();
+      });
+    });
+  }); // describe('TagStore')
 
   describe('workingDir()', function() {
     it("should resolve a path that uses folder seperators from Windows and unix", function() {
@@ -71,6 +96,13 @@ describe('Persistence', function() {
       assert.equal(workingDir(vscode, fs), 'fileFolder');
     });
 
-  }); // describe('workingDir()')
+    it("should return homeFolder when projectFolder is invalid and fileFolder is invalid", function() {
+      vscode.workspace.rootPath = undefined;
+      vscode.window.activeTextEditor = vscode.window;
+      vscode.window.activeTextEditor.document.fileName = 'Untitled-1';
 
+      mockFS({[path.resolve(os.homedir())]: {}});
+      assert.equal(workingDir(vscode, fs), path.resolve(os.homedir(), 'blocks/'));
+    });
+  }); // describe('workingDir()')
 });

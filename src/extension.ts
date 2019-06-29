@@ -1,8 +1,7 @@
 import * as vscode    from 'vscode';
 import * as fs        from  'fs';
 
-import { workingDir } from './dir';
-import { TagStore }   from './tag_store';
+import { TagStore, workingDir }   from './tag_store';
 import { blockParse } from './block_parse';
 
 // VS Code properties
@@ -12,12 +11,11 @@ export function activate({ subscriptions }: vscode.ExtensionContext) {
 	// this runs once on extension activation
 	const myCommandId = 'block-juggler.classify';
 
-	// create a new status bar item that we can now manage
+	// create a new status bar item
 	myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
 	myStatusBarItem.command = myCommandId;
-	subscriptions.push(myStatusBarItem);
-
 	myStatusBarItem.text = `$(megaphone) Block Juggler active!!`;
+	subscriptions.push(myStatusBarItem);
 
 	const disposable = vscode.commands.registerCommand(myCommandId, () => {
 		myStatusBarItem.show();
