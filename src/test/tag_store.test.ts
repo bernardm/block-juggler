@@ -25,6 +25,7 @@ namespace vscode {
 }
 
 describe('Persistence', function() {
+  //TODO how to insert only once
   const assert = require('assert');
 
   describe('TagStore', function() {

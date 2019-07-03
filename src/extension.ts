@@ -3,6 +3,7 @@ import * as fs        from  'fs';
 
 import { TagStore, workingDir }   from './tag_store';
 import { blockParse } from './block_parse';
+import { ShellExecute } from './shell_execute';
 
 // VS Code properties
 let myStatusBarItem: vscode.StatusBarItem;
@@ -30,7 +31,9 @@ export function activate({ subscriptions }: vscode.ExtensionContext) {
 					docSelection); 									// hilighted selection
 
 			const io:TagStore = new TagStore(workingDir(vscode, fs));
-			blockParse(document.getText(docRange), io);
+			const shell:ShellExecute = new ShellExecute();
+
+			blockParse(document.getText(docRange), io, shell);
 			io.close();
 
 			activeEditor

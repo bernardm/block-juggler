@@ -1,10 +1,12 @@
 import { TagStore } from './tag_store';
+import { ShellExecute } from './shell_execute';
 const cp = require('child_process');
 
 export const markerTagIn      = '=<<';
 export const markerTagOut     = '=>>';
 export const markerTagCommand = '=\\\\';
-export const sysCommandNull   = 'rem ';
+export const sysCommandNull   = 'rem';
+
 
 /**
  * Parses tagged text blocks from  given input text.
@@ -13,7 +15,7 @@ export const sysCommandNull   = 'rem ';
  * @param {string}   docText text to parse
  * @param {TagStore} io      initialized TagStore object
  */
-export function blockParse(docText: string, io: TagStore) {
+export function blockParse(docText: string, io: TagStore, shell: ShellExecute) {
    // all tag markers must be preceded by a \n, even the very first one in the text
    switch( docText.substring(0,3) ) {
       case markerTagIn: case markerTagOut: case markerTagCommand:
@@ -26,19 +28,21 @@ export function blockParse(docText: string, io: TagStore) {
     *    =>> output to tags
     *    =<< input from tags
     */
-   const regxBlock = /\n(\=\\\\(?!\\)|\=>>(?!>)|\=<<(?!<))/m;
+   const regxBlock = /(?<=\n)\s*(\=\\\\(?!\\)|\=>>(?!>)|\=<<(?!<))/m;
    const docBlocks = docText.split(regxBlock);
 
+   // no tags. save entire document
    if( !docBlocks ) {
       io.writeFor('', docText);
       return;
-   } else if( docBlocks[0] ) {
-      io.writeFor('', docBlocks[0]+'\n');
    }
 
+   // save untagged text at the start of document
+   io.writeFor('', docBlocks[0]);
+
    for (let blockIndex = 1; blockIndex < docBlocks.length; blockIndex += 2) {
-      const blockType   = docBlocks[blockIndex];
-      const blockData  =  docBlocks[blockIndex + 1];
+      const blockType  = docBlocks[blockIndex];
+      const blockData  = docBlocks[blockIndex + 1];
       let blockAction:string;
       let blockText:string;
 
@@ -51,7 +55,7 @@ export function blockParse(docText: string, io: TagStore) {
          blockText   = '';
       } else {
          blockAction = blockData.slice(0, lineEndPos);
-         blockText   = blockData.slice(lineEndPos + 1) + '\n';
+         blockText   = blockData.slice(lineEndPos + 1);
       }
 
       switch (blockType) {
@@ -67,16 +71,21 @@ export function blockParse(docText: string, io: TagStore) {
          //TODO execAsync
          let cmdOutput:string;
          try {
-            cmdOutput = cp.execSync(blockAction, { input: blockText }).toString();
+            cmdOutput = shell.run(blockAction, blockText);
+            if( blockAction !== 'command' ) {
+               cmdOutput = cp.execSync(blockAction, { input: blockText }).toString();
+            }
          } catch(err) {
             cmdOutput = err.message;
          }
 
          // display output if present
          if ( cmdOutput ) {
-            io.writeFor('', `\n${markerTagCommand}${sysCommandNull} ${blockAction}\n${cmdOutput}\n${markerTagOut}`);
+            io.writeFor('', `${markerTagCommand}${sysCommandNull} ${blockAction}\n${cmdOutput}\n${markerTagOut}\n`);
          }
          break;
       }
    }
 } // blockParse()
+
+
