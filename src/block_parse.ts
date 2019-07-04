@@ -1,6 +1,5 @@
 import { TagStore } from './tag_store';
 import { ShellExecute } from './shell_execute';
-const cp = require('child_process');
 
 export const markerTagIn      = '=<<';
 export const markerTagOut     = '=>>';
@@ -68,16 +67,7 @@ export function blockParse(docText: string, io: TagStore, shell: ShellExecute) {
          break;
 
       case markerTagCommand:
-         //TODO execAsync
-         let cmdOutput:string;
-         try {
-            cmdOutput = shell.run(blockAction, blockText);
-            if( blockAction !== 'command' ) {
-               cmdOutput = cp.execSync(blockAction, { input: blockText }).toString();
-            }
-         } catch(err) {
-            cmdOutput = err.message;
-         }
+         const cmdOutput = shell.run(blockAction, blockText);
 
          // display output if present
          if ( cmdOutput ) {

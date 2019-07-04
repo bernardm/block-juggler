@@ -4,8 +4,6 @@ import { ShellExecute } from '../shell_execute';
 import {
   blockParse, markerTagIn, markerTagOut, markerTagCommand, sysCommandNull
 } from '../block_parse';
-import { toUnicode } from 'punycode';
-import { tasks } from 'vscode';
 
 describe('blockParse()', function() {
   let mockTagStore:TagStore;
@@ -99,10 +97,10 @@ describe('blockParse()', function() {
 
   // bug. command output markers must be on a line by themselves
   it("should place command output markers must be on a line by themselves", function() {
-    blockParse(`before\n${markerTagCommand}echo hello\ndata`, io, shell);
+    const realShell = new ShellExecute('/');
+    blockParse(`before\n${markerTagCommand}echo hello\ndata`, io, realShell);
 
     mock.verify(mockTagStore.writeFor('', 'before\n')).called();
-    mock.verify(mockShellExecute.run('echo hello', 'data')).called();
-    mock.verify(mockTagStore.writeFor('', '=\\\\rem echo hello\nhello\r\n\n=>>\n')).called();
+    mock.verify(mockTagStore.writeFor('', '=\\\\rem echo hello\nhello\n=>>\n')).called();
   });
 });

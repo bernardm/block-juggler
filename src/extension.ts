@@ -30,8 +30,9 @@ export function activate({ subscriptions }: vscode.ExtensionContext) {
 					new vscode.Range(0, 0, document.lineCount, 0):  // entire document
 					docSelection); 									// hilighted selection
 
-			const io:TagStore = new TagStore(workingDir(vscode, fs));
-			const shell:ShellExecute = new ShellExecute();
+			const dir:string = workingDir(vscode, fs);
+			const io:TagStore = new TagStore(dir);
+			const shell:ShellExecute = new ShellExecute(dir);
 
 			blockParse(document.getText(docRange), io, shell);
 			io.close();
