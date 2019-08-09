@@ -11,7 +11,7 @@ export class ShellExecute {
                  //TODO execAsync
         let cmdOutput:string;
         try {
-            cmdOutput = cp.execSync(cmd, { input, cwd: this.shellFolder }).toString().trimRight();
+            cmdOutput = cp.execSync(cmd, { input, cwd: this.shellFolder }).toString().trimRight() + '\n';
         } catch(err) {
             cmdOutput = err.message;
         }

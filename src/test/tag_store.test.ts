@@ -1,14 +1,16 @@
+const mock = require('ts-mockito');
 import { TagStore, workingDir } from '../tag_store';
+import {
+  markerTagOut, markerTagCommand, sysCommandNull
+} from '../block_parse';
 
+import { ShellExecute } from '../shell_execute';
 const fs     = require('fs'); // include before mock-fs
 const mockFS = require('mock-fs');
 const path   = require('path');
 const os     = require('os');
 
-// test constants
-const testDir:string  = path.resolve('/the/seven/bloody/hells/');
-const testFile:string = path.resolve(testDir, 'test.file');
-const testData:string = 'data\n';
+
 
 // mock for vscode
 namespace vscode {
@@ -29,6 +31,11 @@ describe('Persistence', function() {
   const assert = require('assert');
 
   describe('TagStore', function() {
+    // test constants
+    const testDir:string  = path.resolve('/the/seven/bloody/hells/');
+    const testFile:string = path.resolve(testDir, 'test.file');
+    const testData:string = 'data\n';
+
     beforeEach(()=>{
       mockFS({[testDir]: {}});
     });
@@ -54,8 +61,44 @@ describe('Persistence', function() {
       io.close();
 
       writer.on('close', ()=>{
-        let fileData:string  = fs.readFileSync(testFile, 'utf8');
-        assert.equal(fileData, testData+testData+testData);
+        let fileText:string  = fs.readFileSync(testFile, 'utf8');
+        assert.equal(fileText, testData+testData+testData);
+        done();
+      });
+    });
+
+    it("should end every block with a newline", function(done) {
+      const io:TagStore = new TagStore(testDir);
+      const writer = fs.createWriteStream(testFile, {flags:'a'});
+      io._setStream('tag', writer);
+
+      io.writeFor('tag', 'block');
+      io.close();
+
+      writer.on('close', ()=>{
+        let fileText:string  = fs.readFileSync(testFile, 'utf8');
+        assert.equal(fileText, 'block\n');
+        done();
+      });
+    });
+
+    it("should place a command tag on a line by itself", function(done) {
+      const io:TagStore = new TagStore(testDir);
+      const writer = fs.createWriteStream(testFile, {flags:'a'});
+      io._setStream('cmd_output', writer);
+
+      io.writeFor('cmd_output', markerTagCommand + sysCommandNull);
+      io.writeFor('cmd_output', 'output');
+      io.writeFor('cmd_output', markerTagOut);
+      io.close();
+
+      writer.on('close', ()=>{
+        let fileText:string  = fs.readFileSync(testFile, 'utf8');
+        assert.equal(fileText, 
+          markerTagCommand + sysCommandNull + '\n'
+          + 'output\n'
+          + markerTagOut + '\n'
+          );
         done();
       });
     });
@@ -69,8 +112,8 @@ describe('Persistence', function() {
       io.close();
 
       writer.on('close', ()=>{
-        let fileData:string  = fs.readFileSync(testFile, 'utf8');
-        assert.equal(fileData, testData);
+        let fileText:string  = fs.readFileSync(testFile, 'utf8');
+        assert.equal(fileText, testData);
         done();
       });
     });

@@ -4,7 +4,7 @@ import { ShellExecute } from './shell_execute';
 export const markerTagIn      = '=<<';
 export const markerTagOut     = '=>>';
 export const markerTagCommand = '=\\\\';
-export const sysCommandNull   = 'rem';
+export const sysCommandNull   = 'exit 0;';
 
 
 /**
@@ -47,8 +47,7 @@ export function blockParse(docText: string, io: TagStore, shell: ShellExecute) {
 
       let  lineEndPos = blockData.indexOf('\n');
 
-      // when there are no \n in the block, the whole block is the
-      // action. usually a shell command.
+      // when the block only has one line, that line is an action
       if( lineEndPos === -1 ) {
          blockAction = blockData;
          blockText   = '';
@@ -71,7 +70,9 @@ export function blockParse(docText: string, io: TagStore, shell: ShellExecute) {
 
          // display output if present
          if ( cmdOutput ) {
-            io.writeFor('', `${markerTagCommand}${sysCommandNull} ${blockAction}\n${cmdOutput}\n${markerTagOut}\n`);
+            io.writeFor('', `${markerTagCommand}${sysCommandNull} ${blockAction}`);
+            io.writeFor('', cmdOutput);
+            io.writeFor('', markerTagOut);
          }
          break;
       }

@@ -58,6 +58,9 @@ export class TagStore {
 			});
 		}
 		this.tagStream[tag].write(block);
+		if( block.slice(-1) !== '\n' ) { // block does not end with a newline
+			this.tagStream[tag].write('\n');
+		}
 	}
 }
 

@@ -5,6 +5,13 @@ import {
   blockParse, markerTagIn, markerTagOut, markerTagCommand, sysCommandNull
 } from '../block_parse';
 
+function printArgs(fx:any, line:Number) {
+  const [a, b] = mock.capture(fx).last();
+  console.log("line(" + line + ")");
+  console.log('a: "' + a + '"');
+  console.log('b: "' + b + '"');
+}
+
 describe('blockParse()', function() {
   let mockTagStore:TagStore;
   let io:TagStore;
@@ -93,14 +100,5 @@ describe('blockParse()', function() {
 
     blockParse(`three\n${markerTagCommand}cd\ntext`, io, shell);
     mock.verify(mockTagStore.writeFor('', 'three\n')).called();
-  });
-
-  // bug. command output markers must be on a line by themselves
-  it("should place command output markers must be on a line by themselves", function() {
-    const realShell = new ShellExecute('/');
-    blockParse(`before\n${markerTagCommand}echo hello\ndata`, io, realShell);
-
-    mock.verify(mockTagStore.writeFor('', 'before\n')).called();
-    mock.verify(mockTagStore.writeFor('', '=\\\\rem echo hello\nhello\n=>>\n')).called();
   });
 });

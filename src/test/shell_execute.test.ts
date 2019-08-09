@@ -18,6 +18,6 @@ describe('ShellExecute', function() {
       commandPWD = 'pwd';
     }
 
-    assert.equal(shell.run(commandPWD, ''), os.tmpdir());
+    assert.equal(shell.run(commandPWD, ''), os.tmpdir()+'\n');
   });
 });
