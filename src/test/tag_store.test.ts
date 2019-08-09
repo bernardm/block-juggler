@@ -82,25 +82,19 @@ describe('Persistence', function() {
       });
     });
 
-    it("should place a command tag on a line by itself", function(done) {
+    it("should place a command tag on a line by itself", function() {
       const io:TagStore = new TagStore(testDir);
-      const writer = fs.createWriteStream(testFile, {flags:'a'});
-      io._setStream('cmd_output', writer);
 
-      io.writeFor('cmd_output', markerTagCommand + sysCommandNull);
-      io.writeFor('cmd_output', 'output');
-      io.writeFor('cmd_output', markerTagOut);
+      io.writeFor('', markerTagCommand + sysCommandNull);
+      io.writeFor('', 'output');
+      io.writeFor('', markerTagOut);
       io.close();
 
-      writer.on('close', ()=>{
-        let fileText:string  = fs.readFileSync(testFile, 'utf8');
-        assert.equal(fileText, 
-          markerTagCommand + sysCommandNull + '\n'
-          + 'output\n'
-          + markerTagOut + '\n'
-          );
-        done();
-      });
+      assert.equal(io.editorText,
+        markerTagCommand + sysCommandNull + '\n'
+        + 'output\n'
+        + markerTagOut + '\n'
+        );
     });
 
     it("should interpret a tag name with a period as a file", function(done) {

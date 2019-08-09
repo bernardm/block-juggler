@@ -37,6 +37,14 @@ export class TagStore {
 	public writeFor( tag:string, block:string ):void {
 		let tagFile:string;
 
+		// block
+		if( this.isEmpty(block) ) {
+			return;
+		} else if( block.slice(-1) !== '\n' ) { // block does not end with a newline
+			block += '\n';
+		}
+
+		// tag
 		if( '' === tag ) {                   // tag indicates editor data
 			this.editorStream += block;
 			return;
@@ -44,11 +52,12 @@ export class TagStore {
 		} else if( tag.indexOf('.') > -1 ) { // tag is a file
 			tagFile = path.resolve(this.tagFolder, tag);
 
-		} else {                             // tag is a word
+		} else {                      // tag is a word
 			tag = sanitize(tag.toLowerCase());
 			tagFile = path.resolve(this.tagFolder, tag+'.txt');
 		}
 
+		// file
 		if( !this.tagStream[tag] ) {
 			const writer = fs.createWriteStream(tagFile, {flags:'a'});
 			this.tagStream[tag] = writer;
@@ -58,9 +67,10 @@ export class TagStore {
 			});
 		}
 		this.tagStream[tag].write(block);
-		if( block.slice(-1) !== '\n' ) { // block does not end with a newline
-			this.tagStream[tag].write('\n');
-		}
+	} // writeFor()
+
+	private isEmpty(str:String):Boolean {
+		return (str.length === 0 || !str.trim());
 	}
 }
 

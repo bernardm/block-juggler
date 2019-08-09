@@ -60,15 +60,14 @@
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",
-        "@types/node": "^10.12.21",
+        "@types/node": "^10.14.15",
         "mock-fs": "^4.10.1",
-        "sanitize-filename": "^1.6.1",
-        "ts-mockito": "^2.3.1",
-        "tslint": "^5.12.1",
-        "typescript": "^3.3.1",
-        "vscode": "^1.1.28"
+        "ts-mockito": "^2.4.2",
+        "tslint": "^5.18.0",
+        "typescript": "^3.5.3",
+        "vscode": "^1.1.36"
     },
     "dependencies": {
-        "sanitize-filename": "^1.6.1"
+        "sanitize-filename": "^1.6.2"
     }
 }
