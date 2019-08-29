@@ -31,7 +31,27 @@ export class TagStore {
 	}
 
 	public readFor( tag:string ):void {
-		//TODO readFor()
+		let tagFile:string;
+
+		// tag
+		if( '' === tag ) {                   // tag indicates editor data
+			return;
+
+		} else if( tag.indexOf('.') > -1 ) { // tag is a file
+			tagFile = path.resolve(this.tagFolder, tag);
+
+		} else {                      // tag is a word
+			tag = sanitize(tag.toLowerCase());
+			tagFile = path.resolve(this.tagFolder, tag+'.txt');
+		}
+
+		// TODO put block data validation here. method
+		// if block is empty return empty
+		let block = fs.readFileSync(tagFile, 'utf8');
+		if( block.slice(-1) !== '\n' ) { // block does not end with a newline
+			block += '\n';
+		}
+		this.editorStream += block;
 	}
 
 	public writeFor( tag:string, block:string ):void {

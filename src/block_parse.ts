@@ -59,6 +59,7 @@ export function blockParse(docText: string, io: TagStore, shell: ShellExecute) {
       switch (blockType) {
       case markerTagIn:
          blockAction.split(',').map(tag => io.readFor(tag.trim()));
+         io.writeFor('', blockText);
          break;
 
       case markerTagOut:

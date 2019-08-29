@@ -1,6 +1,7 @@
 import {ShellExecute} from '../shell_execute';
 
 const os = require('os');
+const fs = require('fs');
 
 describe('ShellExecute', function() {
   const assert = require('assert');
@@ -18,6 +19,6 @@ describe('ShellExecute', function() {
       commandPWD = 'pwd';
     }
 
-    assert.equal(shell.run(commandPWD, ''), os.tmpdir());
+    assert.equal(shell.run(commandPWD, ''), fs.realpathSync(os.tmpdir()));
   });
 });
