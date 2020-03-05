@@ -1,4 +1,4 @@
-import { TagStore } from './tag_store';
+import { TagStore } from './block_store';
 import { ShellExecute } from './shell_execute';
 
 export const markerTagIn      = '=<<';

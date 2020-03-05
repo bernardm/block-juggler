@@ -4,14 +4,25 @@ const os       = require('os');
 const path     = require("path");
 const sanitize = require("sanitize-filename");
 
+export interface TagAlias {
+	tag: string;
+	filePath: string;
+ }
+
 export class TagStore {
 	private tagStream: {[key: string]: any;} = {};
 	private tagFolder:string;
+	private tagAlias:TagAlias[] = [];
+
 	private editorStream:string = '';
 
 	constructor (folder:string) {
 		this.tagFolder = folder;
 	} // constructor()
+	
+	public addAlias(aliasList:TagAlias[]) {
+		this.tagAlias = Object.assign(aliasList);
+	}
 
 	// for unit testing only
 	public _setStream(tag:string, writer:any):void {
@@ -94,7 +105,7 @@ export class TagStore {
 	}
 }
 
-export function workingDir(vscode:any, fsObj:any):string {
+export function blockSaveDirectory(vscode:any, fsObj:any):string {
 	let returnDir:string = '';
 	const activeEditor = vscode.window.activeTextEditor;
 

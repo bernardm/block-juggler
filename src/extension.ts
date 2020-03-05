@@ -1,7 +1,7 @@
 import * as vscode    from 'vscode';
 import * as fs        from  'fs';
 
-import { TagStore, workingDir }   from './tag_store';
+import { TagStore, blockSaveDirectory }   from './block_store';
 import { blockParse } from './block_parse';
 import { ShellExecute } from './shell_execute';
 
@@ -30,7 +30,7 @@ export function activate({ subscriptions }: vscode.ExtensionContext) {
 					new vscode.Range(0, 0, document.lineCount, 0):  // entire document
 					docSelection); 									// hilighted selection
 
-			const dir:string = workingDir(vscode, fs);
+			const dir:string = blockSaveDirectory(vscode, fs);
 			const io:TagStore = new TagStore(dir);
 			const shell:ShellExecute = new ShellExecute(dir);
 

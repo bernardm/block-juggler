@@ -1,5 +1,5 @@
 const mock = require('ts-mockito');
-import { TagStore, workingDir } from '../tag_store';
+import { TagStore, blockSaveDirectory, TagAlias } from '../block_store';
 import {
   markerTagOut, markerTagCommand, sysCommandNull
 } from '../block_parse';
@@ -110,20 +110,30 @@ describe('Persistence', function() {
       assert.equal(io.editorText, 'block\n');
     });
     
-    it("should place a command tag on a line by itself", function() {
-      const io:TagStore = new TagStore(testDir);
-      //TODO what is this test for?
-      io.writeFor('', markerTagCommand + sysCommandNull);
-      io.writeFor('', 'output');
-      io.writeFor('', markerTagOut);
-      io.close();
+    // it("should store data to a file referenced by an alias", function(done) {
+    //   const io:TagStore = new TagStore(testDir);
+    //   const aliasList:TagAlias[] = [
+    //     {tag: 'file_alias_0', filePath:testFile},
+    //     {tag: 'file_alias_1', filePath:testFile},
+    //   ];  
 
-      assert.equal(io.editorText,
-        markerTagCommand + sysCommandNull + '\n'
-        + 'output\n'
-        + markerTagOut + '\n'
-        );
-    });
+    //   io.addAlias(aliasList);
+    // });
+    // e same file regardless of case", function(done) {
+    //   const io:TagStore = new TagStore(testDir);
+    //   const writer = fs.createWriteStream(testFile, {flags:'a'});
+    //   io._setStream('tag', writer);
+      
+    //   io.writeFor('tag', testData);
+    //   io.writeFor('Tag', testData);
+    //   io.writeFor('TAG', testData);
+    //   io.close();
+      
+    //   writer.on('close', ()=>{
+    //     let fileText:string  = fs.readFileSync(testFile, 'utf8');
+    //     assert.equal(fileText, testData+testData+testData);
+    //     done();
+    //   });
 
     it("should interpret a tag name with a period as a file", function(done) {
       const io:TagStore = new TagStore(testDir);
@@ -151,7 +161,7 @@ describe('Persistence', function() {
       vscode.window.activeTextEditor = vscode.window;
       vscode.window.activeTextEditor.document.fileName = 'fileFolder/file.name';
 
-      assert.equal(workingDir(vscode, fs), 'projectFolder');
+      assert.equal(blockSaveDirectory(vscode, fs), 'projectFolder');
     });
 
     it("should return fileFolder when projectFolder is invalid and fileFolder is valid", function() {
@@ -159,7 +169,7 @@ describe('Persistence', function() {
       vscode.window.activeTextEditor = vscode.window;
       vscode.window.activeTextEditor.document.fileName = 'fileFolder/file.name';
 
-      assert.equal(workingDir(vscode, fs), 'fileFolder');
+      assert.equal(blockSaveDirectory(vscode, fs), 'fileFolder');
     });
 
     it("should return homeFolder when projectFolder is invalid and fileFolder is invalid", function() {
@@ -168,7 +178,7 @@ describe('Persistence', function() {
       vscode.window.activeTextEditor.document.fileName = 'Untitled-1';
 
       mockFS({[path.resolve(os.homedir())]: {}});
-      assert.equal(workingDir(vscode, fs), path.resolve(os.homedir(), 'blocks/'));
+      assert.equal(blockSaveDirectory(vscode, fs), path.resolve(os.homedir(), 'blocks/'));
     });
   }); // describe('workingDir()')
 });

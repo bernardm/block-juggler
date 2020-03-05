@@ -7,7 +7,7 @@ describe('ShellExecute', function() {
   const assert = require('assert');
 
   it('should use specified folder as working directory', function() {
-    const shell = new ShellExecute(os.tmpdir());
+    const shell = new ShellExecute(__dirname);
 
     let commandPWD:string;
     switch( os.platform() ) {
@@ -19,6 +19,7 @@ describe('ShellExecute', function() {
       commandPWD = 'pwd';
     }
 
-    assert.equal(shell.run(commandPWD, ''), fs.realpathSync(os.tmpdir()));
+    //TODO fix realpathsync() -- ENOENT on any path other than root
+    assert.equal(shell.run(commandPWD, ''), __dirname);
   });
 });
