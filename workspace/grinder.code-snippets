@@ -1,0 +1,35 @@
+{
+    "Block Juggler - align text": {
+        "prefix": "bj-align",
+        "body": [
+            "",
+            "=\\\\\\ sed -e 's/[[:space:]]*\\\\$delimiter/~~\\\\$delimiter/g' | column -t -s'~~'",
+            "$TM_SELECTED_TEXT",
+            "=>>",
+            "$0"
+        ],
+        "description": "Align a text block at the specified character"
+    },
+    "Block Juggler - append align text": {
+        "prefix": "bj-append",
+        "body": [
+            "",
+            "=\\\\\\ sed 's/$/~~\\\\$character/' | column -t -s'~~'",
+            "$TM_SELECTED_TEXT",
+            "=>>",
+            "$0"
+        ],
+        "description": "Append character and align a text block"
+    },
+    "Block Juggler - title case": {
+        "prefix": "bj-case-title",
+        "body": [
+            "",
+            "=\\\\\\ awk '{for(j=1;j<=NF;j++){ \\$j=toupper(substr(\\$j,1,1)) substr(\\$j,2) }}1'",
+            "$TM_SELECTED_TEXT",
+            "=>>",
+            "$0"
+        ],
+        "description": "Convert to Title Case"
+    },
+}
